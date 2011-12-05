@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <title>random position</title>
+        <style type="text/css">
+            #box {
+                width: 500px;
+                height: 500px;
+                position: relative;
+                border: 1px solid #000;
+                list-style: none;
+            }
+            
+            #box li {
+                height: 25px;
+                line-height: 25px;
+                position: absolute;
+                padding: 5px 30px;
+                border: 1px solid #DDDDDD;
+                background: none repeat scroll 0 0 #EFEFEF;
+            }
+        </style>
+    </head>
+    <body>
+        <ul id="box">
+            <li>
+                关键字
+            </li>
+        </ul>
+        <script type="text/javascript">
+            var box = document.getElementById('box'), //约束范围
+             list = box.getElementsByTagName('li')[0], //随机元素
+             arr = new Array(), //记录坐标
+             randomTag = 0, //随机标记
+             randomKey = 10; //随机阀值
+            positionFuc(list);//默认的那个放进算法中			
+            for (var i = 0; i <= 100; i++) {
+                var nodeLi = list.cloneNode(true);
+                box.appendChild(nodeLi);
+                positionFuc(nodeLi);
+            }
+            function positionFuc($node){
+                var w = $node.offsetWidth, //元素宽度
+             h = 37, //元素高度
+             boxWidth = 500, //box宽度
+             boxHeight = 500, //box高度				
+             xp = 31, //横向(padding+border)/2 
+             yp = 6, //纵向(padding+border)/2
+             randomX = randomFuc(boxWidth - w), //横向随机位置 
+             randomY = randomFuc(boxHeight - h), //纵向随机位置
+             flag = true;
+                for (var x = 0; x <= w; x++) {
+                    for (var y = 0; y <= h; y++) {
+                        if (arr[(randomY + y) * boxWidth + randomX + x] == 1) {
+                            randomTag++;
+                            if (randomTag == randomKey) 
+                                arr = [];
+                            positionFuc($node);
+                            return flag = false;
+                        }
+                    }
+                }
+                if (flag) {
+                    $node.style.cssText = 'top:' + randomY + 'px;left:' + randomX + 'px;background-color:' + hsl2color([randomFuc(360), 100, 70]);
+                    for (var x = xp; x <= w - xp; x++) {
+                        for (var y = yp; y <= h - yp; y++) {
+                            arr[(randomY + y) * boxWidth + randomX + x] = 1;
+                        }
+                    }
+                    randomTag = 0;
+                }
+            }
+            
+            function randomFuc($value){ //取随机数
+                return parseInt($value * Math.random());
+            }
+            
+            function hsl2color(hsl){ //HSL颜色算法
+                if (hsl[0] > 360 || hsl[0] < 0 || hsl[1] > 100 || hsl[1] < 0 || hsl[2] > 100 || hsl[2] < 0) 
+                    return "#000000";
+                var rgb = [0, 0, 0];
+                if (hsl[0] <= 60) {
+                    rgb[0] = 255;
+                    rgb[1] = Math.floor(255 / 60 * hsl[0]);
+                }
+                else 
+                    if (hsl[0] <= 120) {
+                        rgb[0] = Math.floor(255 - (255 / 60) * (hsl[0] - 60));
+                        rgb[1] = 255;
+                    }
+                    else 
+                        if (hsl[0] <= 180) {
+                            rgb[1] = 255;
+                            rgb[2] = Math.floor((255 / 60) * (hsl[0] - 120));
+                        }
+                        else 
+                            if (hsl[0] <= 240) {
+                                rgb[1] = Math.floor(255 - (255 / 60) * (hsl[0] - 180));
+                                rgb[2] = 255;
+                            }
+                            else 
+                                if (hsl[0] <= 300) {
+                                    rgb[0] = Math.floor((255 / 60) * (hsl[0] - 240));
+                                    rgb[2] = 255;
+                                }
+                                else 
+                                    if (hsl[0] <= 360) {
+                                        rgb[0] = 255;
+                                        rgb[2] = Math.floor(255 - (255 / 60) * (hsl[0] - 300));
+                                    }
+                var sat = Math.abs((hsl[1] - 100) / 100);
+                rgb[0] = Math.floor(rgb[0] - (rgb[0] - 128) * sat);
+                rgb[1] = Math.floor(rgb[1] - (rgb[1] - 128) * sat);
+                rgb[2] = Math.floor(rgb[2] - (rgb[2] - 128) * sat);
+                var lum = (hsl[2] - 50) / 50;
+                if (lum > 0) {
+                    rgb[0] = Math.floor(rgb[0] + (255 - rgb[0]) * lum);
+                    rgb[1] = Math.floor(rgb[1] + (255 - rgb[1]) * lum);
+                    rgb[2] = Math.floor(rgb[2] + (255 - rgb[2]) * lum);
+                }
+                else 
+                    if (lum < 0) {
+                        rgb[0] = Math.floor(rgb[0] + rgb[0] * lum);
+                        rgb[1] = Math.floor(rgb[1] + rgb[1] * lum);
+                        rgb[2] = Math.floor(rgb[2] + rgb[2] * lum);
+                    }
+                return "#" + (0x1000000 + rgb[0] * 0x010000 + rgb[1] * 0x000100 + rgb[2]).toString(16).substring(1);
+            }
+        </script>        
+    </body>
+</html>
